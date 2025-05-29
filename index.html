@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ClearToFly - Advanced Layered Map</title>
+    <title>ClearToFly - Interactive Map</title>
+    <meta charset="UTF-8">
+    <meta property="og:title" content="ClearToFly - המפה האינטראקטיבית שלך">
+    <meta property="og:description" content="לחץ כאן לפתיחת המפה המדויקת של המיקום שביקשת.">
+    <meta property="og:image" content="https://maps.googleapis.com/maps/api/staticmap?center={{LAT}},{{LON}}&zoom=13&size=600x300&markers=color:red|{{LAT}},{{LON}}&key=YOUR_GOOGLE_MAPS_API_KEY">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
@@ -14,9 +19,11 @@
         const userLat = parseFloat(urlParams.get('lat'));
         const userLon = parseFloat(urlParams.get('lon'));
 
+        document.querySelector('meta[property="og:image"]').content = 
+        `https://maps.googleapis.com/maps/api/staticmap?center=${userLat},${userLon}&zoom=13&size=600x300&markers=color:red|${userLat},${userLon}&key=YOUR_GOOGLE_MAPS_API_KEY`;
+
         const map = L.map('map').setView([userLat, userLon], 12);
 
-        // Base layers
         const osmStreets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'OpenStreetMap Streets'
         }).addTo(map);
@@ -28,7 +35,6 @@
             L.esri.basemapLayer('ImageryLabels')
         ]);
 
-        // Custom overlay layers
         const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
             attribution: 'AIP North'
         });
