@@ -11,6 +11,7 @@
     <meta property="og:image:height" content="800">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
 </head>
 <body style="margin:0;">
     <div id="map" style="width: 100%; height: 100vh;"></div>
@@ -22,10 +23,43 @@
 
         const map = L.map('map').setView([userLat, userLon], 13);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // שכבות בסיס
+        const osmStreets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
+        const esriSatellite = L.esri.basemapLayer('Imagery');
+        const esriHybrid = L.layerGroup([
+            L.esri.basemapLayer('Imagery'),
+            L.esri.basemapLayer('ImageryLabels')
+        ]);
+
+        // שכבות מותאמות שלך (צפון ודרום)
+        const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
+            attribution: 'AIP North'
+        });
+
+        const southLayer = L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
+            attribution: 'AIP South'
+        });
+
+        // הגדרת שכבות בסיס
+        const baseLayers = {
+            "רחובות (OpenStreetMap)": osmStreets,
+            "לווין (Esri Satellite)": esriSatellite,
+            "היברידי (Esri Hybrid)": esriHybrid
+        };
+
+        // הגדרת שכבות נוספות לבחירה
+        const overlayLayers = {
+            "מפת צפון": northLayer,
+            "מפת דרום": southLayer
+        };
+
+        // הוספת בורר שכבות
+        L.control.layers(baseLayers, overlayLayers, {collapsed: false}).addTo(map);
+
+        // הוספת סמן נקודה של המשתמש
         const marker = L.marker([userLat, userLon]).addTo(map);
         marker.bindPopup("המיקום המבוקש 🗺️").openPopup();
     </script>
