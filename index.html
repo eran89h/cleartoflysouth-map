@@ -23,7 +23,7 @@
 
         const map = L.map('map').setView([userLat, userLon], 13);
 
-        // שכבות בסיס
+        // Base layers
         const osmStreets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
@@ -34,32 +34,32 @@
             L.esri.basemapLayer('ImageryLabels')
         ]);
 
-        // שכבות מותאמות שלך (צפון ודרום)
+        // השכבות שלך - מופעלות מראש!
         const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
             attribution: 'AIP North'
-        });
+        }).addTo(map); // מופעל מראש
 
         const southLayer = L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
             attribution: 'AIP South'
-        });
+        }).addTo(map); // מופעל מראש
 
-        // הגדרת שכבות בסיס
+        // שכבות בסיס
         const baseLayers = {
             "רחובות (OpenStreetMap)": osmStreets,
             "לווין (Esri Satellite)": esriSatellite,
             "היברידי (Esri Hybrid)": esriHybrid
         };
 
-        // הגדרת שכבות נוספות לבחירה
+        // שכבות נוספות לבחירה
         const overlayLayers = {
             "מפת צפון": northLayer,
             "מפת דרום": southLayer
         };
 
-        // הוספת בורר שכבות
+        // בורר שכבות
         L.control.layers(baseLayers, overlayLayers, {collapsed: false}).addTo(map);
 
-        // הוספת סמן נקודה של המשתמש
+        // סמן נקודה של המשתמש
         const marker = L.marker([userLat, userLon]).addTo(map);
         marker.bindPopup("המיקום המבוקש 🗺️").openPopup();
     </script>
