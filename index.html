@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ClearToFly - Interactive Map</title>
+    <title>ClearToFly - Combined Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
@@ -15,10 +15,17 @@
 
         const map = L.map('map').setView([userLat, userLon], 10);
 
-        L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
-            attribution: 'Map Warper'
+        // שכבת צפון
+        const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
+            attribution: 'AIP North'
         }).addTo(map);
 
+        // שכבת דרום
+        const southLayer = L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
+            attribution: 'AIP South'
+        }).addTo(map);
+
+        // נקודת ציון (פין) למשתמש
         const marker = L.marker([userLat, userLon]).addTo(map);
         marker.bindPopup("המיקום המבוקש").openPopup();
     </script>
