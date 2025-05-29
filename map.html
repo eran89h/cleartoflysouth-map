@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ClearToFly - Interactive Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body style="margin:0;">
+    <div id="map" style="width: 100%; height: 100vh;"></div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const userLat = parseFloat(urlParams.get('lat'));
+        const userLon = parseFloat(urlParams.get('lon'));
+
+        const map = L.map('map').setView([userLat, userLon], 10);
+
+        L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
+            attribution: 'Map Warper'
+        }).addTo(map);
+
+        const marker = L.marker([userLat, userLon]).addTo(map);
+        marker.bindPopup("המיקום המבוקש").openPopup();
+    </script>
+</body>
+</html>
