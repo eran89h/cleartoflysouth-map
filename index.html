@@ -5,63 +5,63 @@
     <meta charset="UTF-8">
     <meta property="og:title" content="ClearToFly – מפה אינטראקטיבית">
     <meta property="og:description" content="לחץ כאן לפתיחת המפה האינטראקטיבית של המיקום שלך.">
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Openstreetmap_logo.svg/800px-Openstreetmap_logo.svg.png">
+    <meta property="og:image" content="">
     <meta property="og:type" content="website">
-    <meta property="og:image:width" content="800">
-    <meta property="og:image:height" content="800">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const userLat = parseFloat(params.get('lat'));
+      const userLon = parseFloat(params.get('lon'));
+      const zoom = parseInt(params.get('zoom')) || 15; // הזום שיוגדר מראש (ברירת מחדל 15)
+
+      // קביעת og:image לתמונה מדויקת וממוקדת מראש
+      const ogImage = document.querySelector('meta[property="og:image"]');
+      ogImage.content = `https://api.apiflash.com/v1/urltoimage?access_key=63a4fef50b4343a0862b590bdffa5747&wait_until=network_idle&url=https://eran89h.github.io/cleartoflysouth-map/?lat=${userLat}&lon=${userLon}&zoom=${zoom}&fresh=true`;
+    </script>
 </head>
 <body style="margin:0;">
-    <div id="map" style="width: 100%; height: 100vh;"></div>
+<div id="map" style="width: 100%; height: 100vh;"></div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const userLat = parseFloat(params.get('lat'));
-        const userLon = parseFloat(params.get('lon'));
+<script>
+    const map = L.map('map').setView([userLat, userLon], zoom);
 
-        const map = L.map('map').setView([userLat, userLon], 13);
+    const osmStreets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-        // Base layers
-        const osmStreets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+    const esriSatellite = L.esri.basemapLayer('Imagery');
+    const esriHybrid = L.layerGroup([
+        L.esri.basemapLayer('Imagery'),
+        L.esri.basemapLayer('ImageryLabels')
+    ]);
 
-        const esriSatellite = L.esri.basemapLayer('Imagery');
-        const esriHybrid = L.layerGroup([
-            L.esri.basemapLayer('Imagery'),
-            L.esri.basemapLayer('ImageryLabels')
-        ]);
+    const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
+        attribution: 'AIP North'
+    }).addTo(map);
 
-        // השכבות שלך - מופעלות מראש!
-        const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
-            attribution: 'AIP North'
-        }).addTo(map); // מופעל מראש
+    const southLayer = L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
+        attribution: 'AIP South'
+    }).addTo(map);
 
-        const southLayer = L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
-            attribution: 'AIP South'
-        }).addTo(map); // מופעל מראש
+    const baseLayers = {
+        "רחובות (OpenStreetMap)": osmStreets,
+        "לווין (Esri Satellite)": esriSatellite,
+        "היברידי (Esri Hybrid)": esriHybrid
+    };
 
-        // שכבות בסיס
-        const baseLayers = {
-            "רחובות (OpenStreetMap)": osmStreets,
-            "לווין (Esri Satellite)": esriSatellite,
-            "היברידי (Esri Hybrid)": esriHybrid
-        };
+    const overlayLayers = {
+        "מפת צפון": northLayer,
+        "מפת דרום": southLayer
+    };
 
-        // שכבות נוספות לבחירה
-        const overlayLayers = {
-            "מפת צפון": northLayer,
-            "מפת דרום": southLayer
-        };
+    L.control.layers(baseLayers, overlayLayers, {collapsed: false}).addTo(map);
 
-        // בורר שכבות
-        L.control.layers(baseLayers, overlayLayers, {collapsed: false}).addTo(map);
-
-        // סמן נקודה של המשתמש
-        const marker = L.marker([userLat, userLon]).addTo(map);
-        marker.bindPopup("המיקום המבוקש 🗺️").openPopup();
-    </script>
+    const marker = L.marker([userLat, userLon]).addTo(map);
+    marker.bindPopup("המיקום המבוקש 🗺️").openPopup();
+</script>
 </body>
 </html>
