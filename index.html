@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ClearToFly - Combined Map</title>
+    <title>ClearToFly - Advanced Layered Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
 </head>
 <body style="margin:0;">
     <div id="map" style="width: 100%; height: 100vh;"></div>
@@ -13,19 +14,42 @@
         const userLat = parseFloat(urlParams.get('lat'));
         const userLon = parseFloat(urlParams.get('lon'));
 
-        const map = L.map('map').setView([userLat, userLon], 10);
+        const map = L.map('map').setView([userLat, userLon], 12);
 
-        // שכבת צפון
+        // Base layers
+        const osmStreets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'OpenStreetMap Streets'
+        }).addTo(map);
+
+        const esriSatellite = L.esri.basemapLayer('Imagery');
+
+        const esriHybrid = L.layerGroup([
+            L.esri.basemapLayer('Imagery'),
+            L.esri.basemapLayer('ImageryLabels')
+        ]);
+
+        // Custom overlay layers
         const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
             attribution: 'AIP North'
-        }).addTo(map);
+        });
 
-        // שכבת דרום
         const southLayer = L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
             attribution: 'AIP South'
-        }).addTo(map);
+        });
 
-        // נקודת ציון (פין) למשתמש
+        const baseLayers = {
+            "רחובות (OpenStreetMap)": osmStreets,
+            "לווין (Esri Satellite)": esriSatellite,
+            "היברידי (Esri Hybrid)": esriHybrid
+        };
+
+        const overlayLayers = {
+            "מפת צפון": northLayer,
+            "מפת דרום": southLayer
+        };
+
+        L.control.layers(baseLayers, overlayLayers, {collapsed: false}).addTo(map);
+
         const marker = L.marker([userLat, userLon]).addTo(map);
         marker.bindPopup("המיקום המבוקש").openPopup();
     </script>
