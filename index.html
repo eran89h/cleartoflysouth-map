@@ -3,68 +3,76 @@
 <head>
     <title>ClearToFly - Interactive Map</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="ClearToFly – מפה אינטראקטיבית">
     <meta property="og:description" content="לחץ כאן לפתיחת המפה האינטראקטיבית של המיקום שלך.">
-    <meta property="og:image" content="">
     <meta property="og:type" content="website">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const userLat = parseFloat(params.get('lat'));
-      const userLon = parseFloat(params.get('lon'));
-      const zoom = parseInt(params.get('zoom')) || 15;
 
-      // הגדרת og:image
-      const ogImage = document.querySelector('meta[property="og:image"]');
-      ogImage.content = `https://api.apiflash.com/v1/urltoimage?access_key=63a4fef50b4343a0862b590bdffa5747&delay=5&url=https://eran89h.github.io/cleartoflysouth-map/?lat=${userLat}&lon=${userLon}&zoom=${zoom}&fresh=true`;
-    </script>
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            height: 100%; width: 100%;
+        }
+        #map {
+            height: 100%; width: 100%;
+        }
+        .leaflet-control-layers {
+            font-size: 16px; /* הגדלת הפונט לתפריט */
+            padding: 10px;
+        }
+        .leaflet-control-layers-selector {
+            transform: scale(1.4); /* הגדלת הכפתורים בתפריט */
+            margin: 4px;
+        }
+    </style>
 </head>
-<body style="margin:0;">
-<div id="map" style="width: 100%; height: 100vh;"></div>
+<body>
+    <div id="map"></div>
 
-<script>
-    // השהייה של חצי שניה לפני טעינת המפה לוודא שהכל נטען
-    setTimeout(() => {
-      const map = L.map('map').setView([userLat, userLon], zoom);
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const userLat = parseFloat(params.get('lat'));
+        const userLon = parseFloat(params.get('lon'));
+        const zoom = parseInt(params.get('zoom')) || 16;
 
-      const osmStreets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+        const map = L.map('map').setView([userLat, userLon], zoom);
 
-      const esriSatellite = L.esri.basemapLayer('Imagery');
-      const esriHybrid = L.layerGroup([
-          L.esri.basemapLayer('Imagery'),
-          L.esri.basemapLayer('ImageryLabels')
-      ]);
+        const osmStreets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-      const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
-          attribution: 'AIP North'
-      }).addTo(map);
+        const esriSatellite = L.esri.basemapLayer('Imagery');
+        const esriHybrid = L.layerGroup([
+            L.esri.basemapLayer('Imagery'),
+            L.esri.basemapLayer('ImageryLabels')
+        ]);
 
-      const southLayer = L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
-          attribution: 'AIP South'
-      }).addTo(map);
+        const northLayer = L.tileLayer('https://mapwarper.net/maps/tile/93412/{z}/{x}/{y}.png', {
+            attribution: 'AIP North'
+        }).addTo(map);
 
-      const baseLayers = {
-          "רחובות (OpenStreetMap)": osmStreets,
-          "לווין (Esri Satellite)": esriSatellite,
-          "היברידי (Esri Hybrid)": esriHybrid
-      };
+        const southLayer = L.tileLayer('https://mapwarper.net/maps/tile/93413/{z}/{x}/{y}.png', {
+            attribution: 'AIP South'
+        }).addTo(map);
 
-      const overlayLayers = {
-          "מפת צפון": northLayer,
-          "מפת דרום": southLayer
-      };
+        const baseLayers = {
+            "רחובות (OpenStreetMap)": osmStreets,
+            "לווין (Esri Satellite)": esriSatellite,
+            "היברידי (Esri Hybrid)": esriHybrid
+        };
 
-      L.control.layers(baseLayers, overlayLayers, {collapsed: false}).addTo(map);
+        const overlayLayers = {
+            "מפת צפון": northLayer,
+            "מפת דרום": southLayer
+        };
 
-      const marker = L.marker([userLat, userLon]).addTo(map);
-      marker.bindPopup("המיקום המבוקש 🗺️").openPopup();
-    }, 500); // 500ms השהייה
-</script>
+        L.control.layers(baseLayers, overlayLayers, {collapsed: false}).addTo(map);
+
+        const marker = L.marker([userLat, userLon]).addTo(map);
+        marker.bindPopup("המיקום המבוקש 🗺️").openPopup();
+    </script>
 </body>
 </html>
